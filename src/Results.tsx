@@ -10,8 +10,8 @@ export function ResultsPage() {
     <>
       <section className="section cases-intro">
         <div className="container">
-          <Eyebrow>{t('Результати лікування')}</Eyebrow>
-          <AnimatedHeading as="h1">{t('До / Після')}</AnimatedHeading>
+          <Eyebrow>{t('Історії посмішок')}</Eyebrow>
+          <AnimatedHeading as="h1">{t('Мої роботи')}</AnimatedHeading>
           <p className="cases-lead">
             {t('Кожна посмішка має свою історію. Фотографії до та після ортодонтичного лікування.')}
           </p>

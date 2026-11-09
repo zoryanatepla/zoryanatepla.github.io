@@ -80,7 +80,7 @@ export function Results() {
       <div className="container">
         <Reveal className="section-heading">
           <div>
-            <Eyebrow>{t('Результати лікування')}</Eyebrow>
+            <Eyebrow>{t('Історії посмішок')}</Eyebrow>
             <AnimatedHeading as="h2">
               {t('За кожною посмішкою —')}
               <br />

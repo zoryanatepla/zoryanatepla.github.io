@@ -5,7 +5,7 @@ import { services, servicePath } from '../data/services'
 function ukrainianSeo(path: string) {
   if (path.replace(/\/$/, '') === '/do-pislia')
     return {
-      title: 'До та після ортодонтичного лікування | Зоряна Тепла',
+      title: 'Мої роботи — до та після лікування | Зоряна Тепла',
       description:
         'Фотографії до та після ортодонтичного лікування. Роботи лікаря стоматолога-ортодонта Зоряни Теплої, Київ.',
       path: '/do-pislia/',

@@ -739,7 +739,7 @@ body:has(.mentorship-hero) .mobile-booking {
   }
 }
 
-/* Clinical pairs keep their original proportions and remain visible together. */
+/* One shared wipe comparison for the featured case and the full gallery. */
 .cases-intro {
   padding-bottom: 32px;
 }
@@ -766,30 +766,57 @@ body:has(.mentorship-hero) .mobile-booking {
   border-radius: 4px;
   overflow: hidden;
 }
-.before-after-pair {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1px;
-  background: var(--line);
+.comparison.before-after-pair {
+  aspect-ratio: 1.7;
+  background: var(--surface-soft);
 }
-.before-after-pair figure {
-  margin: 0;
-  min-width: 0;
-  padding: 20px;
-  background: var(--surface);
+.before-after-pair .comparison-before,
+.before-after-pair .comparison-after {
+  position: absolute;
+  inset: 0;
 }
-.before-after-pair figcaption {
-  color: var(--ink);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  margin-bottom: 16px;
+.before-after-pair .comparison-before {
+  z-index: 1;
+}
+.before-after-pair .comparison-after {
+  z-index: 0;
 }
 .before-after-pair img {
   display: block;
   width: 100%;
-  aspect-ratio: 1.7;
+  height: 100%;
   object-fit: contain;
   background: var(--surface-soft);
+  pointer-events: none;
+  user-select: none;
+}
+.before-after-pair .comparison-label {
+  z-index: 2;
+  background: var(--surface);
+  color: var(--ink);
+}
+.before-after-pair .comparison-divider {
+  z-index: 3;
+  box-shadow: 0 0 3px #14201a99;
+}
+.before-after-pair .comparison-divider > span {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--sage);
+}
+.before-after-pair .comparison-range {
+  z-index: 4;
+  touch-action: pan-y;
+}
+.case-card:focus-within {
+  outline: 2px solid var(--sage);
+  outline-offset: 4px;
+}
+.comparison-hint {
+  margin: 0;
+  padding: 14px 20px;
+  color: var(--muted);
+  font-size: 12px;
 }
 .featured-case + .small-note {
   margin-top: 24px;
@@ -809,12 +836,6 @@ body:has(.mentorship-hero) .mobile-booking {
   }
 }
 @media (max-width: 700px) {
-  .before-after-pair {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .before-after-pair figure {
-    padding: 16px;
-  }
   .cases-gallery > .container {
     gap: 28px;
   }

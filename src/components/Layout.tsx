@@ -17,7 +17,7 @@ const navItems = [
   { label: 'Напрями лікування', to: '/#services' },
   { label: 'Мій підхід', to: '/#approach' },
   { label: 'Ваш шлях', to: journeyPath },
-  { label: 'До / Після', to: '/do-pislia/' },
+  { label: 'Мої роботи', to: '/do-pislia/' },
   { label: 'Менторство', to: '/mentorstvo/' },
   { label: 'Запитання', to: '/#faq' },
   { label: 'Контакти', to: '/#contacts' },
@@ -369,7 +369,7 @@ export function Footer() {
             </div>
           </div>
           <div className="footer-bottom">
-            <Link to="/do-pislia/">{t('До / Після')}</Link>
+            <Link to="/do-pislia/">{t('Мої роботи')}</Link>
             <Link to="/mentorstvo/">{t('Менторство')}</Link>
             <span>{t('© 2026 Зоряна Тепла. Київ, Україна.')}</span>
             <Link to="/polityka-konfidentsiinosti/">{t('Політика конфіденційності')}</Link>

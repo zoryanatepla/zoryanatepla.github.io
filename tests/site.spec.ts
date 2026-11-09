@@ -44,9 +44,7 @@ test('home, real contacts, navigation and route-specific static HTML', async ({
   expect(errors).toEqual([])
 })
 
-test('FAQ supports keyboard interaction and the featured pair links to all cases', async ({
-  page,
-}) => {
+test('FAQ and featured comparison support keyboard interaction', async ({ page }) => {
   await page.goto('/')
   const question = page.getByRole('button', { name: 'Чим відрізняються елайнери від брекетів?' })
   await question.click()
@@ -57,6 +55,10 @@ test('FAQ supports keyboard interaction and the featured pair links to all cases
   await question.press('Enter')
   await expect(question).toHaveAttribute('aria-expanded', 'false')
   await expect(page.locator('#results .before-after-pair img')).toHaveCount(2)
+  const slider = page.getByRole('slider', { name: 'Порівняння до та після' })
+  await slider.focus()
+  await slider.press('ArrowRight')
+  await expect(slider).toHaveValue('51')
   await expect(page.locator('#results a[href="/do-pislia/"]')).toBeVisible()
   await expect(page.locator('.review-empty-label')).toContainText('Перші історії')
 })
