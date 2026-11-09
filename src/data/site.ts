@@ -97,4 +97,14 @@ export type TreatmentResult = {
   beforeAlt: string
   afterAlt: string
 }
-export const treatmentResults: TreatmentResult[] = []
+// User-supplied originals in order: 01–02, 03–04, 05–06, 07–08.
+export const treatmentResults: TreatmentResult[] = Array.from({ length: 4 }, (_, index) => ({
+  id: `case-${index + 1}`,
+  title: 'Ортодонтичне лікування',
+  description: '',
+  before: `${import.meta.env.BASE_URL}images/results/${String(index * 2 + 1).padStart(2, '0')}.webp`,
+  after: `${import.meta.env.BASE_URL}images/results/${String(index * 2 + 2).padStart(2, '0')}.webp`,
+  beforeAlt: 'Фото зубів до ортодонтичного лікування',
+  afterAlt: 'Фото зубів після ортодонтичного лікування',
+}))
+export const featuredResult = treatmentResults[2]

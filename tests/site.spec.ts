@@ -44,7 +44,9 @@ test('home, real contacts, navigation and route-specific static HTML', async ({
   expect(errors).toEqual([])
 })
 
-test('FAQ disclosure and comparison slider support keyboard interaction', async ({ page }) => {
+test('FAQ supports keyboard interaction and the featured pair links to all cases', async ({
+  page,
+}) => {
   await page.goto('/')
   const question = page.getByRole('button', { name: 'Чим відрізняються елайнери від брекетів?' })
   await question.click()
@@ -54,11 +56,8 @@ test('FAQ disclosure and comparison slider support keyboard interaction', async 
   ).toBeVisible()
   await question.press('Enter')
   await expect(question).toHaveAttribute('aria-expanded', 'false')
-  const slider = page.getByRole('slider', { name: 'Порівняння до та після' })
-  await slider.focus()
-  await slider.press('ArrowRight')
-  await expect(slider).toHaveValue('51')
-  await expect(page.locator('.comparison-caption')).toContainText('Дизайн-заглушка')
+  await expect(page.locator('#results .before-after-pair img')).toHaveCount(2)
+  await expect(page.locator('#results a[href="/do-pislia/"]')).toBeVisible()
   await expect(page.locator('.review-empty-label')).toContainText('Перші історії')
 })
 

@@ -47,7 +47,7 @@ export function ReadingProgress() {
 // and its text together. Server HTML stays complete and readable without JS.
 const images = '.hero-photo-frame, .about-photo-frame, .editorial-photo'
 const surfaces =
-  '.service-card, .form-card, .map-card, .mentorship-card, .mentorship-topic, .mentorship-stage, .preparation-card, .journey-summary, .comparison-wrap, .review-content, .service-note, .association, .encouragement, .step, .journey-explorer, .mentorship-visual, .journey-art, .approach-visual'
+  '.service-card, .form-card, .map-card, .mentorship-card, .mentorship-topic, .mentorship-stage, .preparation-card, .journey-summary, .comparison-wrap, .case-card, .review-content, .service-note, .association, .encouragement, .step, .journey-explorer, .mentorship-visual, .journey-art, .approach-visual'
 
 const text = [
   '[data-motion-heading]',

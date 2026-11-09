@@ -27,6 +27,7 @@ const allowed = new Set([
   'polityka-konfidentsiinosti',
   'vash-shliakh-do-posmishky',
   'mentorstvo',
+  'do-pislia',
   'en',
 ])
 const entries = await fs.readdir('dist')
@@ -45,6 +46,7 @@ for (const entry of entries) {
       'polityka-konfidentsiinosti',
       'vash-shliakh-do-posmishky',
       'mentorstvo',
+      'do-pislia',
       'en',
     ].includes(entry)
   ) {

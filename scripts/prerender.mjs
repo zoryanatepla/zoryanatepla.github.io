@@ -53,6 +53,7 @@ try {
     ...services.map((s) => servicePath(s.id)),
     journeyPath,
     '/mentorstvo/',
+    '/do-pislia/',
     '/polityka-konfidentsiinosti/',
   ]
   const paths = [...ukrainianPaths, ...ukrainianPaths.map((path) => localizedPath(path, 'en'))]

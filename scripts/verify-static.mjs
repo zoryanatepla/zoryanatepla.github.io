@@ -14,6 +14,7 @@ const ukrainianPaths = [
   '/poslugy/hnatolohiia/',
   '/vash-shliakh-do-posmishky/',
   '/mentorstvo/',
+  '/do-pislia/',
   '/polityka-konfidentsiinosti/',
 ]
 const paths = [...ukrainianPaths, ...ukrainianPaths.map((path) => `/en${path}`)]
@@ -116,6 +117,16 @@ if (origin) {
   assert.ok(!robots.includes('Sitemap:'))
   await assert.rejects(fs.access(`${folder}/sitemap.xml`))
 }
+// Never publish the new gallery with missing clinical originals.
+for (let index = 1; index <= 8; index++) {
+  const file = `${folder}/images/results/${String(index).padStart(2, '0')}.webp`
+  await fs.access(file).catch(() => {
+    throw new Error(
+      `Missing original treatment photo: ${file}. Supply the eight original files before publication.`,
+    )
+  })
+}
+
 console.log(
-  `Static checks passed: 16 pages, UK/EN languages, hreflang, clinic address, SEO, schema, 404, assets, robots${origin ? ', canonical, sitemap' : ' (domain pending)'}. Base: ${base}`,
+  `Static checks passed: 18 pages, UK/EN languages, hreflang, clinic address, SEO, schema, 404, assets, robots${origin ? ', canonical, sitemap' : ' (domain pending)'}. Base: ${base}`,
 )

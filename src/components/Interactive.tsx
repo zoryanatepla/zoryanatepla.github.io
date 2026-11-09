@@ -2,12 +2,12 @@ import { useI18n } from '../i18n/I18n'
 import { AnimatedHeading } from '../motion/AnimatedHeading'
 import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { ArrowLeft, ArrowRight, ChevronsLeftRight, Plus, Quote } from 'lucide-react'
-import { faq, reviews, treatmentResults } from '../data/site'
-import { Eyebrow, Reveal } from './ui'
+import { ArrowLeft, ArrowRight, Plus, Quote } from 'lucide-react'
+import { faq, reviews, featuredResult } from '../data/site'
+import { Action, Eyebrow, Reveal } from './ui'
 import { silk } from '../motion/presets'
 import { Encouragement } from './Atmosphere'
-import { Monogram } from './Monogram'
+import { BeforeAfterPair } from './BeforeAfterPair'
 
 export function FAQ() {
   const { t } = useI18n()
@@ -75,119 +75,26 @@ export function FAQ() {
 
 export function Results() {
   const { t } = useI18n()
-
-  const [amount, setAmount] = useState(50)
-  const [index, setIndex] = useState(0)
-  const result = treatmentResults[index]
   return (
     <section id="results" className="section results-section">
-      <div className="container results-layout">
-        <Reveal>
-          <Eyebrow>{t('Результати лікування')}</Eyebrow>
-          <AnimatedHeading as="h2">
-            {t('За кожною посмішкою —')}
-            <br />
-            <em>{t('особиста історія.')}</em>
-          </AnimatedHeading>
-          <p className="muted">
-            {t(
-              'Кожен випадок індивідуальний. Тут з’являться реальні історії лікування — з повагою до приватності та лише за згодою пацієнтів.',
-            )}
-          </p>
-          <Encouragement label={t('У кожної посмішки — свій ритм')}>
-            {t(
-              'Важливо порівнювати себе із собою та рухатися за власним планом, а не за чужими очікуваннями.',
-            )}
-          </Encouragement>
-          <p className="small-note">
-            {t('Результати інших пацієнтів не є гарантією аналогічного результату лікування.')}
-          </p>
-          {treatmentResults.length > 1 && (
-            <div className="carousel-controls">
-              <button
-                className="round-button"
-                aria-label={t('Попередній результат')}
-                onClick={() => {
-                  setIndex((index - 1 + treatmentResults.length) % treatmentResults.length)
-                  setAmount(50)
-                }}
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <span>
-                {index + 1} / {treatmentResults.length}
-              </span>
-              <button
-                className="round-button"
-                aria-label={t('Наступний результат')}
-                onClick={() => {
-                  setIndex((index + 1) % treatmentResults.length)
-                  setAmount(50)
-                }}
-              >
-                <ArrowRight size={18} />
-              </button>
-            </div>
-          )}
-        </Reveal>
-        <Reveal className="comparison-wrap">
-          <div className={`comparison ${result ? 'has-result' : ''}`}>
-            {result ? (
-              <>
-                <img src={result.after} alt={result.afterAlt} loading="lazy" />
-                <div
-                  className="comparison-before"
-                  style={{ clipPath: `inset(0 ${100 - amount}% 0 0)` }}
-                >
-                  <img src={result.before} alt={result.beforeAlt} loading="lazy" />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="comparison-art" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div
-                  className="comparison-tint"
-                  style={{ clipPath: `inset(0 ${100 - amount}% 0 0)` }}
-                />
-                <div className="comparison-placeholder">
-                  <span className="tiny-caps">{t('Простір для справжніх змін')}</span>
-                  <Monogram className="comparison-monogram" />
-                  <span>{t('Фотографії незабаром')}</span>
-                </div>
-              </>
-            )}
-            <span className="comparison-label before-label">{t('До')}</span>
-            <span className="comparison-label after-label">{t('Після')}</span>
-            <div className="comparison-divider" style={{ left: `${amount}%` }} aria-hidden="true">
-              <span>
-                <ChevronsLeftRight size={20} />
-              </span>
-            </div>
-            <input
-              type="range"
-              min="3"
-              max="97"
-              value={amount}
-              onChange={(e) => setAmount(+e.target.value)}
-              aria-label={t('Порівняння до та після')}
-              aria-valuetext={`${amount}${t('% зображення до лікування')}`}
-              className="comparison-range"
-            />
+      <div className="container">
+        <Reveal className="section-heading">
+          <div>
+            <Eyebrow>{t('Результати лікування')}</Eyebrow>
+            <AnimatedHeading as="h2">
+              {t('За кожною посмішкою —')}
+              <br />
+              <em>{t('особиста історія.')}</em>
+            </AnimatedHeading>
           </div>
-          <p className="comparison-caption">
-            {result ? result.title : t('Дизайн-заглушка · клінічні фотографії не додані')}
-            <span>
-              {t('Потягніть, щоб порівняти ')}
-              <ArrowLeft size={12} aria-hidden="true" />
-              <ArrowRight size={12} aria-hidden="true" />
-            </span>
-          </p>
-          {result && <p className="small-note">{result.description}</p>}
+          <Action to="/do-pislia/">{t('Переглянути всі роботи')}</Action>
         </Reveal>
+        <Reveal className="case-card featured-case">
+          <BeforeAfterPair result={featuredResult} />
+        </Reveal>
+        <p className="small-note">
+          {t('Результати інших пацієнтів не є гарантією аналогічного результату лікування.')}
+        </p>
       </div>
     </section>
   )

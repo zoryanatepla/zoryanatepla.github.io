@@ -738,3 +738,84 @@ body:has(.mentorship-hero) .mobile-booking {
     scale: 1.045;
   }
 }
+
+/* Clinical pairs keep their original proportions and remain visible together. */
+.cases-intro {
+  padding-bottom: 32px;
+}
+.cases-intro h1 {
+  font-size: clamp(56px, 7vw, 96px);
+  margin-block: 24px;
+}
+.cases-lead {
+  max-width: 660px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.9;
+}
+.cases-gallery {
+  padding-top: 12px;
+}
+.cases-gallery > .container {
+  display: grid;
+  gap: 48px;
+}
+.case-card {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.before-after-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.before-after-pair figure {
+  margin: 0;
+  min-width: 0;
+  padding: 20px;
+  background: var(--surface);
+}
+.before-after-pair figcaption {
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+.before-after-pair img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.7;
+  object-fit: contain;
+  background: var(--surface-soft);
+}
+.featured-case + .small-note {
+  margin-top: 24px;
+}
+.cases-appointment {
+  background: var(--surface-soft);
+}
+.cases-appointment h2 {
+  margin-bottom: 30px;
+}
+@media (min-width: 1051px) and (max-width: 1450px) {
+  .desktop-nav {
+    gap: 10px;
+  }
+  .desktop-nav a {
+    font-size: 10px;
+  }
+}
+@media (max-width: 700px) {
+  .before-after-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .before-after-pair figure {
+    padding: 16px;
+  }
+  .cases-gallery > .container {
+    gap: 28px;
+  }
+}

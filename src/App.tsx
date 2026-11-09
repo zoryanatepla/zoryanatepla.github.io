@@ -4,6 +4,7 @@ import { Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { Header, Footer, RouteEffects } from './components/Layout'
 import { Home } from './Home'
 import { NotFound, PrivacyPage, ServicePage } from './Pages'
+import { ResultsPage } from './Results'
 import { JourneyPage } from './Journey'
 import { MentorshipPage } from './Mentorship'
 import { ReadingProgress, DetailMotion, MotionEnvironment } from './components/Atmosphere'
@@ -59,6 +60,7 @@ function PageContent() {
           <Route element={<SceneLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/poslugy/:id/" element={<ServicePage />} />
+            <Route path="/do-pislia/" element={<ResultsPage />} />
             <Route path="/mentorstvo/" element={<MentorshipPage />} />
             <Route path="/vash-shliakh-do-posmishky/" element={<JourneyPage />} />
             <Route path="/polityka-konfidentsiinosti/" element={<PrivacyPage />} />

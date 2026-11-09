@@ -19,7 +19,7 @@ export function Reveal({
     </div>
   )
   const surface =
-    /(?:^|\s)(form-card|map-card|mentorship-card|mentorship-topic|mentorship-stage|journey-summary|preparation-card|comparison-wrap|review-content|service-note|encouragement|step|journey-explorer|association|mentorship-visual|journey-art|approach-visual)(?:\s|$)/.test(
+    /(?:^|\s)(form-card|map-card|mentorship-card|mentorship-topic|mentorship-stage|journey-summary|preparation-card|comparison-wrap|case-card|review-content|service-note|encouragement|step|journey-explorer|association|mentorship-visual|journey-art|approach-visual)(?:\s|$)/.test(
       className,
     )
   return surface ? (
