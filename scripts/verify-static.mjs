@@ -58,7 +58,10 @@ for (const path of paths) {
   )
   assert.ok(!/24 (?:роки|років)/.test(html), `${path}: current experience claim`)
   assert.ok(html.includes(`src="${base}assets/`), `${path}: script respects base path`)
-  assert.ok(html.includes(`href="${base}favicon.svg"`), `${path}: favicon respects base path`)
+  for (const icon of ['favicon-zt.png', 'favicon.ico', 'apple-touch-icon.png']) {
+    assert.ok(html.includes(`href="${base}${icon}?`), `${path}: ${icon} respects base path`)
+    await fs.access(`${folder}/${icon}`)
+  }
   if (origin) {
     assert.ok(html.includes(`rel="canonical" href="${origin}${base}${path.slice(1)}"`))
     const clean = path.replace(/^\/en(?=\/|$)/, '')

@@ -19,6 +19,10 @@ const allowed = new Set([
   '404.html',
   '.nojekyll',
   'favicon.svg',
+  'favicon.ico',
+  'favicon-zt.png',
+  'favicon-zt-512.png',
+  'apple-touch-icon.png',
   'robots.txt',
   'sitemap.xml',
   'googlec1003d020b97f89b.html',
@@ -47,8 +51,17 @@ for (const entry of entries) {
 }
 // Google may verify either the account origin or the /dentist/ URL-prefix property.
 await fs.copyFile('dist/googlec1003d020b97f89b.html', 'googlec1003d020b97f89b.html')
+// Root-level fallbacks also serve the redirect homepage, search crawlers and older browsers.
+for (const icon of [
+  'favicon.ico',
+  'favicon-zt.png',
+  'favicon-zt-512.png',
+  'apple-touch-icon.png',
+]) {
+  await fs.copyFile(`dist/${icon}`, icon)
+}
 function redirectHtml(destination) {
-  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зоряна Тепла — сайт</title><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зоряна Тепла — сайт</title><link rel="icon" type="image/png" sizes="96x96" href="/favicon-zt.png?v=zt1"><link rel="shortcut icon" href="/favicon.ico?v=zt1"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=zt1"><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
 }
 await fs.writeFile('index.html', redirectHtml('/dentist/'))
 await fs.writeFile('404.html', redirectHtml('/dentist/'))
