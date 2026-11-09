@@ -21,6 +21,7 @@ const allowed = new Set([
   'favicon.svg',
   'robots.txt',
   'sitemap.xml',
+  'googlec1003d020b97f89b.html',
   'assets',
   'images',
   'poslugy',
@@ -44,6 +45,8 @@ await fs.cp('assets', `${publishRoot}/assets`, { recursive: true, force: true })
 for (const entry of entries) {
   await fs.cp(`dist/${entry}`, `${publishRoot}/${entry}`, { recursive: true, force: true })
 }
+// Google may verify either the account origin or the /dentist/ URL-prefix property.
+await fs.copyFile('dist/googlec1003d020b97f89b.html', 'googlec1003d020b97f89b.html')
 function redirectHtml(destination) {
   return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зоряна Тепла — сайт</title><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
 }
