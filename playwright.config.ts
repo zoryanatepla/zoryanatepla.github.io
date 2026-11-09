@@ -16,22 +16,9 @@ export default defineConfig({
     },
     trace: 'retain-on-failure',
   },
-  webServer: [
-    {
-      command: 'VITE_FORMSPREE_ENDPOINT= npm run dev -- --port 4175 --strictPort',
-      port: 4175,
-      reuseExistingServer: !process.env.CI,
-    },
-    {
-      command: 'npm run preview -- --port 4173 --strictPort',
-      port: 4173,
-      reuseExistingServer: !process.env.CI,
-    },
-    {
-      command:
-        'VITE_FORMSPREE_ENDPOINT=https://formspree.io/f/testform npm run dev -- --port 4174 --strictPort',
-      port: 4174,
-      reuseExistingServer: !process.env.CI,
-    },
-  ],
+  webServer: {
+    command: 'npm run preview -- --port 4173 --strictPort',
+    port: 4173,
+    reuseExistingServer: !process.env.CI,
+  },
 })

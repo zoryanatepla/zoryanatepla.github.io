@@ -1,15 +1,14 @@
 import { useI18n } from '../i18n/I18n'
-import { AnimatedHeading } from '../motion/AnimatedHeading'
 import { useRef, useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
-import { ArrowUpRight, Check, LoaderCircle, Phone, ShieldCheck } from 'lucide-react'
+import { ArrowUpRight, ShieldCheck } from 'lucide-react'
 import { Link } from '../i18n/I18n'
-import { site } from '../data/site'
 import { motion, useReducedMotion } from 'motion/react'
 import { silk } from '../motion/presets'
 import { services } from '../data/services'
-import { submitAppointment, validateAppointment } from '../lib/form'
+import { validateAppointment } from '../lib/form'
 import type { Appointment, FieldErrors } from '../lib/form'
+import { TelegramRequest } from './TelegramRequest'
 
 const initial: Appointment = {
   name: '',
@@ -27,13 +26,11 @@ export function AppointmentForm() {
   const reduced = useReducedMotion()
   const [values, setValues] = useState(initial)
   const [errors, setErrors] = useState<FieldErrors>({})
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'error'>('idle')
+  const [showRequest, setShowRequest] = useState(false)
   const [message, setMessage] = useState('')
   const [ready, setReady] = useState(false)
-  const controller = useRef<AbortController | null>(null)
   const form = useRef<HTMLFormElement>(null)
-  const locked = useRef(false)
-  useEffect(() => () => controller.current?.abort(), [])
   useEffect(() => setReady(true), [])
   function update<K extends keyof Appointment>(key: K, value: Appointment[K]) {
     setValues((v) => ({ ...v, [key]: value }))
@@ -43,9 +40,8 @@ export function AppointmentForm() {
       setMessage('')
     }
   }
-  async function submit(event: FormEvent) {
+  function submit(event: FormEvent) {
     event.preventDefault()
-    if (locked.current) return
     const nextErrors = validateAppointment(values)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) {
@@ -54,29 +50,15 @@ export function AppointmentForm() {
       )
       return
     }
-    locked.current = true
-    setStatus('sending')
-    const abort = new AbortController()
-    controller.current = abort
-    const timeout = setTimeout(() => abort.abort(), 15000)
-    try {
-      await submitAppointment(site.formEndpoint, values, abort.signal)
-      setStatus('success')
-      setValues(initial)
-    } catch (error) {
+    if (values.website) {
       setStatus('error')
-      setMessage(
-        error instanceof Error && error.name !== 'AbortError' && error.name !== 'TypeError'
-          ? error.message
-          : t(
-              'Не вдалося підтвердити приймання заявки через проблему зі з’єднанням. Будь ласка, зв’яжіться телефоном.',
-            ),
-      )
-    } finally {
-      clearTimeout(timeout)
-      locked.current = false
+      setMessage('Не вдалося надіслати форму. Спробуйте ще раз.')
+      return
     }
+    setStatus('idle')
+    setShowRequest(true)
   }
+
   const error = (key: keyof Appointment) =>
     errors[key] ? (
       <motion.span
@@ -94,52 +76,15 @@ export function AppointmentForm() {
     'aria-describedby': errors[key] ? `error-${key}` : undefined,
   })
 
-  if (status === 'success')
-    return (
-      <div className="form-success" role="status">
-        <span className="success-icon">
-          <Check size={30} />
-        </span>
-        <AnimatedHeading as="h3">{t('Дякую за вашу довіру.')}</AnimatedHeading>
-        <p>
-          {t(
-            'Сервіс прийняв вашу заявку. Зв’яжемося з вами, щоб узгодити зручний час консультації.',
-          )}
-        </p>
-        <button className="text-link" onClick={() => setStatus('idle')}>
-          {t('Повернутися до форми ')}
-          <ArrowUpRight size={16} />
-        </button>
-      </div>
-    )
-
   return (
     <form
       ref={form}
       method="post"
-      action={site.formEndpoint || undefined}
       className="appointment-form"
       onSubmit={submit}
       noValidate
       aria-label={t('Форма запису на консультацію')}
-      aria-busy={status === 'sending'}
     >
-      {!site.formEndpoint && (
-        <p className="form-availability">
-          {t('Онлайн-запис готується до відкриття.')}
-          {site.contacts.phone && (
-            <>
-              {' '}
-              {t('Зараз можна')}{' '}
-              <a href={`tel:${site.contacts.phone}`}>
-                {t('записатися телефоном ')}
-                <Phone size={13} aria-hidden="true" />
-              </a>
-              .
-            </>
-          )}
-        </p>
-      )}
       <noscript>
         <p className="form-availability">
           {t(
@@ -147,7 +92,7 @@ export function AppointmentForm() {
           )}
         </p>
       </noscript>
-      <fieldset disabled={!ready || status === 'sending'} className="form-fields">
+      <fieldset disabled={!ready} className="form-fields">
         <legend className="sr-only">{t('Ваші контактні дані')}</legend>
         <div className="form-row">
           <div className="field">
@@ -283,17 +228,9 @@ export function AppointmentForm() {
           </label>
           {error('consent')}
         </div>
-        <button
-          className="button button-primary submit-button"
-          type="submit"
-          disabled={status === 'sending'}
-        >
-          <span>{status === 'sending' ? t('Надсилаємо…') : t('Надіслати заявку')}</span>
-          {status === 'sending' ? (
-            <LoaderCircle size={18} className="spinner" aria-hidden="true" />
-          ) : (
-            <ArrowUpRight size={18} aria-hidden="true" />
-          )}
+        <button className="button button-primary submit-button" type="submit">
+          <span>{t('Надіслати заявку')}</span>
+          <ArrowUpRight size={18} aria-hidden="true" />
         </button>
       </fieldset>
       <div className="form-status" aria-live="polite" aria-atomic="true">
@@ -309,6 +246,7 @@ export function AppointmentForm() {
           </motion.p>
         )}
       </div>
+      {showRequest && <TelegramRequest values={values} onClose={() => setShowRequest(false)} />}
       <p className="form-safety">
         <ShieldCheck size={15} aria-hidden="true" />
         {t('Ваші дані — лише для зв’язку з вами.')}

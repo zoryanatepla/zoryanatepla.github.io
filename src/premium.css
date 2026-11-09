@@ -867,3 +867,129 @@ body:has(.mentorship-hero) .mobile-booking {
   object-position: 58% center;
   transform: none;
 }
+
+/* Mobile framing retains the original resolution and leaves space above the hair. */
+@media (max-width: 700px) {
+  .approach-visual {
+    min-height: 0;
+    aspect-ratio: 957 / 974;
+  }
+  .approach-visual > .doctor-portrait {
+    top: 0;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    object-fit: initial;
+    transform: translateY(-24%);
+  }
+}
+.telegram-request {
+  width: min(680px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 100px #0005;
+  overflow-y: auto;
+}
+.telegram-request::backdrop {
+  background: #15291ee0;
+}
+.telegram-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 26px;
+}
+.telegram-header h2 {
+  font-family: inherit;
+  font-size: 18px;
+  margin: 0;
+}
+.telegram-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.telegram-icon {
+  display: grid;
+  place-items: center;
+  background: var(--sage);
+  color: #fff;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+}
+.telegram-close {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.telegram-preview {
+  background: var(--surface-soft);
+  padding: 26px;
+}
+.telegram-preview textarea {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+  max-height: 40dvh;
+  resize: vertical;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px 16px 0 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font:
+    14px/1.8 'Manrope',
+    sans-serif;
+  white-space: pre-wrap;
+}
+.telegram-footer {
+  padding: 20px 26px;
+}
+.telegram-footer p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.telegram-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+.telegram-actions > * {
+  flex: 1;
+  padding-inline: 16px;
+}
+.telegram-copy-status {
+  min-height: 22px;
+  margin: 12px 0 0;
+  color: var(--muted);
+}
+@media (max-width: 500px) {
+  .telegram-header,
+  .telegram-footer {
+    padding: 16px;
+  }
+  .telegram-preview {
+    padding: 16px;
+  }
+  .telegram-preview textarea {
+    padding: 16px;
+    font-size: 13px;
+  }
+  .telegram-actions {
+    flex-direction: column;
+  }
+}

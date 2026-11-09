@@ -70,59 +70,105 @@ async function fillForm(page: import('@playwright/test').Page) {
   await page.getByRole('checkbox').check()
 }
 
-test('disabled form validates, does not transmit data, and never invents success', async ({
+test('Telegram preview validates fields, preserves the draft, traps focus and never submits data', async ({
   page,
 }) => {
   let submissions = 0
   page.on('request', (r) => {
     if (r.method() === 'POST') submissions++
   })
-  await page.goto('http://localhost:4175/#appointment')
+  await page.goto('/#appointment')
   await page.getByRole('button', { name: 'Надіслати заявку' }).click()
   await expect(page.locator('#error-name')).toBeVisible()
   await expect(page.locator('#name')).toBeFocused()
   await expect(page.locator('#error-phone')).toBeVisible()
   await expect(page.locator('#error-consent')).toBeVisible()
   await fillForm(page)
+  await page.getByLabel('Ваш коментар').fill('Зручний час: після 18:00 & вихідні')
   await page.getByRole('button', { name: 'Надіслати заявку' }).click()
-  await expect(page.getByRole('alert')).toContainText('Онлайн-запис поки недоступний')
-  await expect(page.locator('.form-success')).toHaveCount(0)
+  const dialog = page.getByRole('dialog', { name: 'Заявка для Telegram' })
+  await expect(dialog).toBeVisible()
+  const text = await dialog.getByLabel('Текст заявки').inputValue()
+  expect(text).toBe(
+    'Вітаю! Хочу записатися на консультацію.\n\nІм’я: Тестова заявка\nНомер телефону: +380670000000\nДля кого консультація: Дорослий\nНапрям звернення: Первинна консультація\nКоментар: Зручний час: після 18:00 & вихідні',
+  )
+  const url = new URL(
+    (await dialog.getByRole('link', { name: 'Відкрити Telegram' }).getAttribute('href'))!,
+  )
+  expect(url.origin + url.pathname).toBe('https://t.me/Zoryana_Tepla')
+  expect(url.searchParams.get('text')).toBe(text)
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.press('Tab')
+    expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+  }
+  const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
+  expect(axe.violations).toEqual([])
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Надіслати заявку' })).toBeFocused()
+  await expect(page.getByLabel('Ваше ім’я')).toHaveValue('Тестова заявка')
   expect(submissions).toBe(0)
   expect(
     await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })),
   ).toEqual({ local: 0, session: 0 })
-  expect(page.url()).not.toContain('670000000')
+  await expect(page.locator('#contacts a[href="mailto:orthodentua@gmail.com"]')).toBeVisible()
 })
 
-for (const scenario of ['accepted', 'rejected', 'unconfirmed', 'network', 'limited'] as const) {
-  test(`configured Formspree endpoint: ${scenario}`, async ({ page }) => {
-    let count = 0
-    await page.route('https://formspree.io/f/testform', async (route) => {
-      count++
-      const data = route.request().postDataJSON()
-      expect(data.name).toBe('Тестова заявка')
-      expect(data.consent).toBe(true)
-      expect(data._gotcha).toBe('')
-      if (scenario === 'network') return route.abort()
-      await route.fulfill({
-        status: scenario === 'rejected' ? 500 : scenario === 'limited' ? 429 : 200,
-        contentType: 'application/json',
-        body: JSON.stringify(scenario === 'accepted' ? { ok: true } : { error: 'Test response' }),
-      })
-    })
-    await page.goto('http://localhost:4174/#appointment')
+test('copy request handles clipboard success and denial without losing text', async ({ page }) => {
+  for (const denied of [false, true]) {
+    await page.goto('/#appointment')
+    await page.evaluate(
+      (denied) =>
+        Object.defineProperty(navigator, 'clipboard', {
+          configurable: true,
+          value: {
+            writeText: async (text: string) => {
+              if (denied) throw new Error('denied')
+              ;(window as Window & { copiedText?: string }).copiedText = text
+            },
+          },
+        }),
+      denied,
+    )
     await fillForm(page)
     await page.getByRole('button', { name: 'Надіслати заявку' }).click()
-    if (scenario === 'accepted')
-      await expect(page.locator('.form-success')).toContainText('Сервіс прийняв вашу заявку')
-    else {
-      await expect(page.getByRole('alert')).toBeVisible()
-      await expect(page.locator('.form-success')).toHaveCount(0)
-      await expect(page.getByLabel('Ваше ім’я')).toHaveValue('Тестова заявка')
+    const dialog = page.getByRole('dialog')
+    await dialog.getByRole('button', { name: 'Скопіювати заявку' }).click()
+    const text = await dialog.getByLabel('Текст заявки').inputValue()
+    if (denied) {
+      await expect(dialog.getByRole('status')).toContainText('Скопіюйте його вручну')
+      expect(
+        await dialog
+          .getByLabel('Текст заявки')
+          .evaluate((el: HTMLTextAreaElement) => el.selectionEnd - el.selectionStart),
+      ).toBe(text.length)
+    } else {
+      await expect(dialog.getByRole('status')).toHaveText('Заявку скопійовано')
+      expect(
+        await page.evaluate(() => (window as Window & { copiedText?: string }).copiedText),
+      ).toBe(text)
     }
-    expect(count).toBe(1)
-  })
-}
+    await dialog.getByRole('button', { name: 'Закрити вікно' }).click()
+  }
+})
+
+test('Telegram dialog fits mobile screens and uses English field labels', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 700 })
+    await page.goto('/en/#appointment')
+    await page.locator('#name').fill('Test visitor')
+    await page.locator('#phone').fill('+380670000000')
+    await page.locator('#direction').selectOption('Первинна консультація')
+    await page.locator('#consent').check()
+    await page.getByRole('button', { name: 'Send request' }).click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    expect(await dialog.getByRole('textbox').inputValue()).toContain('Consultation for: Adult')
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+    await dialog.getByRole('button', { name: 'Close dialog' }).click()
+  }
+})
 
 test('honeypot prevents transmission', async ({ page }) => {
   let count = 0
@@ -130,7 +176,7 @@ test('honeypot prevents transmission', async ({ page }) => {
     count++
     return route.fulfill({ json: { ok: true } })
   })
-  await page.goto('http://localhost:4174/#appointment')
+  await page.goto('/#appointment')
   await fillForm(page)
   await page.locator('#website').evaluate((el: HTMLInputElement) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
@@ -209,40 +255,32 @@ test('WCAG 2.2 AA automated checks on desktop, mobile, form and service', async 
   }
 })
 
-for (const outcome of ['accepted', 'network'] as const) {
-  test(`production Formspree address handles ${outcome} without sending real mail`, async ({
-    page,
-  }) => {
-    let count = 0
-    await page.route('https://formspree.io/f/xwllyzab', async (route) => {
-      count++
-      const data = route.request().postDataJSON()
-      expect(data.name).toBe('Тестова заявка')
-      expect(data.phone).toBe('+380670000000')
-      expect(data.direction).toBe('Первинна консультація')
-      expect(data.consent).toBe(true)
-      expect(data._gotcha).toBe('')
-      if (outcome === 'network') return route.abort()
-      return route.fulfill({ status: 200, json: { ok: true } })
+test('mobile portrait shows the full forehead while desktop framing stays unchanged', async ({
+  page,
+}) => {
+  for (const width of [320, 390, 700, 1440]) {
+    await page.setViewportSize({ width, height: 1000 })
+    await page.goto('/')
+    const image = page.locator('.approach-visual > img')
+    await image.scrollIntoViewIfNeeded()
+    await image.evaluate((el: HTMLImageElement) => el.decode())
+    const framing = await image.evaluate((el) => {
+      const rect = el.getBoundingClientRect(),
+        frame = el.parentElement!.getBoundingClientRect()
+      return {
+        scale: rect.width / frame.width,
+        height: rect.height / frame.height,
+        hair: (rect.top + rect.height * 0.26 - frame.top) / frame.height,
+        transform: getComputedStyle(el).transform,
+      }
     })
-    await page.goto('/#appointment')
-    await expect(page.locator('form.appointment-form')).toHaveAttribute(
-      'action',
-      'https://formspree.io/f/xwllyzab',
-    )
-    await expect(page.locator('form .form-availability')).toHaveCount(0)
-    await fillForm(page)
-    await page.getByRole('button', { name: 'Надіслати заявку' }).click()
-    if (outcome === 'accepted')
-      await expect(page.locator('.form-success')).toContainText('Сервіс прийняв вашу заявку')
-    else {
-      await expect(page.getByRole('alert')).toBeVisible()
-      await expect(page.getByLabel('Ваше ім’я')).toHaveValue('Тестова заявка')
-      await expect(page.locator('.form-success')).toHaveCount(0)
+    if (width <= 700) {
+      expect(framing.scale).toBeCloseTo(1, 2)
+      expect(framing.hair).toBeGreaterThan(0)
+      expect(framing.hair).toBeLessThan(0.06)
+    } else {
+      expect(framing.height).toBeCloseTo(1.34, 2)
+      expect(framing.transform).toBe('none')
     }
-    expect(count).toBe(1)
-    await expect(page.locator('#contacts a[href="mailto:orthodentua@gmail.com"]')).toHaveText(
-      'Електронна поштаorthodentua@gmail.com',
-    )
-  })
-}
+  }
+})
