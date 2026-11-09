@@ -9,7 +9,7 @@ export default defineConfig({
     'premium.spec.ts',
     'results.spec.ts',
   ],
-  metadata: { siteBase: '' },
+  metadata: { siteBase: '/dentist' },
   workers: 2,
   fullyParallel: true,
   use: {
@@ -24,7 +24,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'node tests/static-server.mjs',
-    url: 'http://127.0.0.1:4176/',
+    url: 'http://127.0.0.1:4176/dentist/',
     reuseExistingServer: !process.env.CI,
   },
 })

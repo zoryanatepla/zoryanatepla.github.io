@@ -8,7 +8,7 @@ async function steady(page: import('@playwright/test').Page, path: string) {
 test('page exit precedes entry without empty frames or a replaced header', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
-  await page.goto('/')
+  await page.goto('/dentist/')
   await page.evaluate(() => {
     const w = window as typeof window & { framesLog: unknown[]; recordFrames: boolean }
     w.framesLog = []
@@ -55,13 +55,13 @@ test('page exit precedes entry without empty frames or a replaced header', async
 })
 
 test('navigation remains interactive and the latest click wins during exit', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/dentist/')
   await page
     .locator('.desktop-nav a[href$="vash-shliakh-do-posmishky/"]')
     .dispatchEvent('click', { button: 0 })
   await page.waitForTimeout(70)
   await page.locator('.header-appointment').dispatchEvent('click', { button: 0 })
-  await expect(page).toHaveURL(/\/#appointment$/)
+  await expect(page).toHaveURL(/\/dentist\/#appointment$/)
   await steady(page, '/')
   await expect(page.locator('#appointment')).toBeInViewport()
   await expect(page.locator('#name')).toBeEnabled()
@@ -71,7 +71,7 @@ test('navigation remains interactive and the latest click wins during exit', asy
 })
 
 test('back and forward animate and restore the saved scroll position', async ({ page }) => {
-  await page.goto('/#services')
+  await page.goto('/dentist/#services')
   await expect(page.locator('#services')).toBeInViewport()
   await page
     .locator('.service-card')
@@ -104,7 +104,7 @@ test('back and forward animate and restore the saved scroll position', async ({ 
 test('step details fade out before changing and rapid keyboard choices settle correctly', async ({
   page,
 }) => {
-  await page.goto('/vash-shliakh-do-posmishky/')
+  await page.goto('/dentist/vash-shliakh-do-posmishky/')
   const tabs = page.getByRole('tab')
   await tabs.first().focus()
   await tabs.first().press('End')
@@ -134,7 +134,7 @@ test('step details fade out before changing and rapid keyboard choices settle co
 test('switching reduced motion on mid-transition cancels movement immediately', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/dentist/')
   await page
     .locator('.desktop-nav a[href$="vash-shliakh-do-posmishky/"]')
     .dispatchEvent('click', { button: 0 })
@@ -177,7 +177,7 @@ test('animated typography fits every page on mobile, tablet and desktop', async 
       'vash-shliakh-do-posmishky/',
       'polityka-konfidentsiinosti/',
     ]) {
-      await page.goto(`/${path}`)
+      await page.goto(`/dentist/${path}`)
       await expect(page.locator('h1')).toBeVisible()
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -191,11 +191,11 @@ test('decorative numbering is absent in service cards and every mentorship block
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto('/dentist/')
   await expect(page.locator('.service-card')).toHaveCount(4)
   await expect(page.locator('.service-number')).toHaveCount(0)
   for (const language of ['', 'en/']) {
-    await page.goto(`/${language}mentorstvo/`)
+    await page.goto(`/dentist/${language}mentorstvo/`)
     await expect(
       page.locator(
         '.mentorship-index, .mentorship-stage-number, .mentorship-rail, .mentorship-visual-rule',
@@ -229,7 +229,7 @@ test('decorative numbering is absent in service cards and every mentorship block
 })
 
 test('the first screen animates from the main headline before any scrolling', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await page.goto('/dentist/', { waitUntil: 'domcontentloaded' })
   const hero = await page.locator('.hero h1').evaluate((el) => {
     const words = [...el.querySelectorAll<HTMLElement>('.motion-word')]
     return {
@@ -267,7 +267,7 @@ test('the first screen animates from the main headline before any scrolling', as
 test('paragraphs and words have visible entrances, with no clipping or nested movement', async ({
   page,
 }) => {
-  await page.goto('/mentorstvo/')
+  await page.goto('/dentist/mentorstvo/')
   const paragraph = page.locator('.mentorship-prose > p').last()
   const heading = page.locator('.mentorship-about h2').first()
   await expect(paragraph).toHaveAttribute('data-motion-unit', 'true')
@@ -320,7 +320,7 @@ test('paragraphs and words have visible entrances, with no clipping or nested mo
 })
 
 test('text replays when scrolling back, including the very first headline', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/dentist/')
   const headline = page.locator('.hero h1')
   await expect(headline).toHaveAttribute('data-reveal-count', '1')
   await page
@@ -360,7 +360,7 @@ test('rapid scrolling still reveals text and finishes without replaying while it
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
+  await page.goto('/dentist/')
   for (const id of ['services', 'faq', 'contacts', 'about', 'services']) {
     await page
       .locator(`#${id}`)
@@ -397,7 +397,7 @@ test('rapid scrolling still reveals text and finishes without replaying while it
 test('cards, images, forms and maps reveal as complete surfaces using stationary anchors', async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto('/dentist/')
   for (const selector of ['.service-card', '.form-card', '.map-card', '.review-content']) {
     const surface = page.locator(selector).first()
     await expect(surface).toHaveAttribute('data-reveal-kind', 'surface')
@@ -446,9 +446,9 @@ test('cards, images, forms and maps reveal as complete surfaces using stationary
       await expect(page.locator('#name')).toHaveValue('Збережені дані')
     }
   }
-  await page.goto('/poslugy/brekety/')
+  await page.goto('/dentist/poslugy/brekety/')
   await expect(page.locator('.service-page-photo')).toHaveAttribute('data-reveal-kind', 'image')
-  await page.goto('/mentorstvo/')
+  await page.goto('/dentist/mentorstvo/')
   await expect(page.locator('.mentorship-request')).toContainText('Напишіть мені в Instagram')
   await expect(page.locator('.mentorship-request')).not.toContainText('Напишіть Зоряні Теплій')
 })
@@ -457,7 +457,7 @@ test('map card is compact, the photo has no quote plaque, and pointer hover is l
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto('/dentist/')
   await expect(page.locator('.approach-quote')).toHaveCount(0)
   await expect(page.locator('.approach-visual .editorial-photo')).toBeVisible()
   for (const width of [390, 1440]) {
@@ -512,7 +512,7 @@ test('home refresh clears the section fragment and returns to the hero, while di
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const locale of ['', 'en/']) {
-    await page.goto(`/${locale}?view=refresh#about`)
+    await page.goto(`/dentist/${locale}?view=refresh#about`)
     await expect(page.locator('#about')).toBeInViewport()
     await page.reload()
     await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(3)
@@ -524,7 +524,7 @@ test('home refresh clears the section fragment and returns to the hero, while di
     await page.reload()
     await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(3)
   }
-  await page.goto('/mentorstvo/')
+  await page.goto('/dentist/mentorstvo/')
   await page.reload()
   await expect(page).toHaveURL(/\/mentorstvo\/$/)
   await expect(page.locator('h1')).toContainText('Менторство')

@@ -7,7 +7,7 @@ execFileSync(process.execPath, ['scripts/verify-static.mjs'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    VITE_BASE_PATH: '/',
+    VITE_BASE_PATH: '/dentist/',
     VITE_SITE_URL: 'https://zoryanatepla.github.io',
   },
 })
@@ -37,29 +37,52 @@ if (!entries.includes('sitemap.xml') || !entries.includes('.nojekyll')) {
 for (const entry of entries) {
   if (!allowed.has(entry)) throw new Error(`Unexpected build output: ${entry}`)
 }
+// Restore the previous release at its original project path inside the renamed repository.
+const publishRoot = 'dentist'
+await fs.mkdir(publishRoot, { recursive: true })
+await fs.cp('assets', `${publishRoot}/assets`, { recursive: true, force: true })
 for (const entry of entries) {
-  // Keep old hashed JS/CSS for cached HTML and tabs opened before a release.
-  if (
-    [
-      'images',
-      'poslugy',
-      'polityka-konfidentsiinosti',
-      'vash-shliakh-do-posmishky',
-      'mentorstvo',
-      'do-pislia',
-      'en',
-    ].includes(entry)
-  ) {
-    await fs.rm(entry, { recursive: true, force: true })
-  }
-  await fs.cp(`dist/${entry}`, entry, { recursive: true, force: true })
+  await fs.cp(`dist/${entry}`, `${publishRoot}/${entry}`, { recursive: true, force: true })
 }
-console.log('Prepared verified GitHub Pages files in main/(root). Editable HTML: src/index.html.')
-execFileSync(process.execPath, ['scripts/verify-static.mjs', '--published'], {
-  stdio: 'inherit',
-  env: {
-    ...process.env,
-    VITE_BASE_PATH: '/',
-    VITE_SITE_URL: 'https://zoryanatepla.github.io',
+function redirectHtml(destination) {
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зоряна Тепла — сайт</title><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
+}
+await fs.writeFile('index.html', redirectHtml('/dentist/'))
+await fs.writeFile('404.html', redirectHtml('/dentist/'))
+for (const entry of [
+  'poslugy',
+  'polityka-konfidentsiinosti',
+  'vash-shliakh-do-posmishky',
+  'mentorstvo',
+  'do-pislia',
+  'en',
+]) {
+  async function redirectDirectory(directory) {
+    for (const item of await fs.readdir(directory, { withFileTypes: true })) {
+      const name = `${directory}/${item.name}`
+      if (item.isDirectory()) await redirectDirectory(name)
+      else if (item.name === 'index.html')
+        await fs.writeFile(name, redirectHtml(`/dentist/${directory}/`))
+    }
+  }
+  await redirectDirectory(entry)
+}
+await fs.writeFile(
+  'robots.txt',
+  'User-agent: *\nAllow: /\nSitemap: https://zoryanatepla.github.io/dentist/sitemap.xml\n',
+)
+await fs.copyFile('dentist/sitemap.xml', 'sitemap.xml')
+console.log('Restored the complete site under /dentist/; the account root forwards there.')
+execFileSync(
+  process.execPath,
+  [new URL('./verify-static.mjs', import.meta.url).pathname, '--published'],
+  {
+    cwd: publishRoot,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      VITE_BASE_PATH: '/dentist/',
+      VITE_SITE_URL: 'https://zoryanatepla.github.io',
+    },
   },
-})
+)

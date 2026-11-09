@@ -28,7 +28,7 @@ test('cold entry, reload, slash redirect and new tabs work on the actual publish
     'polityka-konfidentsiinosti/',
   ]
   for (const path of paths) {
-    const response = await page.goto(`/${path}`)
+    const response = await page.goto(`/dentist/${path}`)
     expect(response?.status()).toBe(200)
     await expect(page.locator('h1')).toBeVisible()
     if (!path.startsWith('polityka')) await expect(page.locator('#name')).toBeEnabled()
@@ -36,23 +36,23 @@ test('cold entry, reload, slash redirect and new tabs work on the actual publish
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      `https://zoryanatepla.github.io/${path}`,
+      `https://zoryanatepla.github.io/dentist/${path}`,
     )
   }
-  await page.goto('/vash-shliakh-do-posmishky')
+  await page.goto('/dentist/vash-shliakh-do-posmishky')
   await expect(page).toHaveURL(/vash-shliakh-do-posmishky\/$/)
   const tab = await context.newPage()
-  await tab.goto('/vash-shliakh-do-posmishky/')
+  await tab.goto('/dentist/vash-shliakh-do-posmishky/')
   await expect(tab.locator('h1')).toBeVisible()
   await tab.close()
   expect(errors).toEqual([])
 })
 
 test('journey supports all six steps, keyboard navigation and progress', async ({ page }) => {
-  await page.goto('/vash-shliakh-do-posmishky/')
+  await page.goto('/dentist/vash-shliakh-do-posmishky/')
   const tabs = page.getByRole('tab')
   const portrait = page.locator('.journey-art .doctor-portrait')
-  await expect(portrait).toHaveAttribute('src', '/images/zoryana-tepla-journey.webp')
+  await expect(portrait).toHaveAttribute('src', '/dentist/images/zoryana-tepla-journey.webp')
   await expect
     .poll(() => portrait.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
     .toBe(true)
@@ -74,10 +74,10 @@ test('journey supports all six steps, keyboard navigation and progress', async (
   await tabs.nth(1).press('End')
   await expect(tabs.last()).toBeFocused()
   await page.getByRole('link', { name: 'Обговорити мій шлях' }).click()
-  await expect(page).toHaveURL(/\/#appointment$/)
+  await expect(page).toHaveURL(/\/dentist\/#appointment$/)
   await expect(page.locator('#appointment')).toBeInViewport()
   await page.reload()
-  await expect(page).toHaveURL(/\/$/)
+  await expect(page).toHaveURL(/\/dentist\/$/)
   await expect(page.locator('.hero h1')).toBeInViewport()
   expect(await page.evaluate(() => scrollY)).toBeLessThan(3)
 })
@@ -86,14 +86,14 @@ test('no JavaScript or a failed script never produces an empty document', async 
   const context = await browser.newContext({ javaScriptEnabled: false })
   const page = await context.newPage()
   for (const path of ['', 'vash-shliakh-do-posmishky/']) {
-    await page.goto(`http://127.0.0.1:4176/${path}`)
+    await page.goto(`http://127.0.0.1:4176/dentist/${path}`)
     await expect(page.locator('h1')).toBeVisible()
     expect(await page.locator('#root').innerText()).toContain('Зоряна Тепла')
   }
   await context.close()
   const p = await browser.newPage()
   await p.route('**/assets/*.js', (r) => r.abort())
-  await p.goto('http://127.0.0.1:4176/')
+  await p.goto('http://127.0.0.1:4176/dentist/')
   await expect(p.locator('h1')).toBeVisible()
   await expect(p.locator('#root')).not.toBeEmpty()
   await p.close()
@@ -108,10 +108,10 @@ test('cached HTML from the preceding release still has working script and styles
     if (r.status() >= 400) failures.push(r.url())
   })
   page.on('pageerror', (e) => failures.push(e.message))
-  await page.route('http://127.0.0.1:4176/', (r) =>
+  await page.route('http://127.0.0.1:4176/dentist/', (r) =>
     r.fulfill({ contentType: 'text/html', body: previous }),
   )
-  await page.goto('/')
+  await page.goto('/dentist/')
   await expect(page.locator('h1')).toBeVisible()
   await expect(page.locator('#name')).toBeEnabled()
   expect(failures).toEqual([])
@@ -127,7 +127,7 @@ test('release validation rejects the source-only HTML that caused the first whit
         cwd: directory,
         env: {
           ...process.env,
-          VITE_BASE_PATH: '/',
+          VITE_BASE_PATH: '/dentist/',
           VITE_SITE_URL: 'https://zoryanatepla.github.io',
         },
         stdio: 'pipe',
@@ -141,14 +141,14 @@ test('release validation rejects the source-only HTML that caused the first whit
 test('new design is accessible, responsive and honours reduced motion', async ({ page }) => {
   for (const width of [320, 390, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 })
-    await page.goto('/vash-shliakh-do-posmishky/')
+    await page.goto('/dentist/vash-shliakh-do-posmishky/')
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
       `journey overflow at ${width}`,
     ).toBe(true)
   }
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto('/dentist/')
   const card = page.locator('.service-card').first()
   await card.hover()
   await expect(card.locator('.editorial-photo')).toHaveCSS('scale', '1')
@@ -160,7 +160,7 @@ test('new design is accessible, responsive and honours reduced motion', async ({
   await expect(card).toHaveCSS('transform', 'none')
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const path of ['', 'vash-shliakh-do-posmishky/', 'poslugy/elainery/']) {
-    await page.goto(`/${path}`)
+    await page.goto(`/dentist/${path}`)
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
       .analyze()

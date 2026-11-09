@@ -12,7 +12,7 @@ const paths = [
 ]
 
 test('clinic details, map destination, experience and requested removals', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('/dentist/')
   const contacts = page.locator('#contacts')
   await expect(contacts.locator('.clinic-address')).toHaveText(
     'вулиця Юлії Здановської, 58А, Київ, 03191',
@@ -70,7 +70,7 @@ test('English routes, metadata and navigation remain in English after direct ent
     if (m.type() === 'error') errors.push(m.text())
   })
   for (const path of paths) {
-    const url = `/en/${path}`
+    const url = `/dentist/en/${path}`
     const html = await (await request.get(url)).text()
     expect(html).toContain('lang="en"')
     expect(html).toContain('Zoryana Tepla')
@@ -84,21 +84,21 @@ test('English routes, metadata and navigation remain in English after direct ent
     )
     await expect(page.locator('link[hreflang="uk"]')).toHaveAttribute(
       'href',
-      `https://zoryanatepla.github.io/${path}`,
+      `https://zoryanatepla.github.io/dentist/${path}`,
     )
     expect(await page.locator('main').innerText()).not.toMatch(/[А-Яа-яІіЇїЄєҐґ]{3,}/)
     await page.reload()
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   }
-  await page.goto('/#services')
+  await page.goto('/dentist/#services')
   await page.getByRole('link', { name: 'EN — English', exact: true }).click()
-  await expect(page).toHaveURL(/\/en\/#services$/)
+  await expect(page).toHaveURL(/\/dentist\/en\/#services$/)
   await expect(page.locator('#services')).toBeInViewport()
   await page.locator('.service-card').first().click()
   await expect(page).toHaveURL(/\/en\/poslugy\/brekety\/$/)
   await expect(page.locator('h1')).toHaveText('Braces')
   await page.getByRole('link', { name: 'UA — Українська', exact: true }).click()
-  await expect(page).toHaveURL(/\/poslugy\/brekety\/$/)
+  await expect(page).toHaveURL(/\/dentist\/poslugy\/brekety\/$/)
   await expect(page.locator('h1')).toHaveText('Брекет-системи')
   await page.getByRole('link', { name: 'EN — English', exact: true }).click()
   await page.getByRole('link', { name: 'Book a consultation', exact: true }).first().click()
@@ -121,7 +121,7 @@ test('system theme, explicit preference, reload and new tabs preserve theme with
   context,
 }) => {
   await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' })
-  await page.goto('/en/#appointment')
+  await page.goto('/dentist/en/#appointment')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.getByLabel('Your name').fill('Theme Test')
   await page.getByRole('button', { name: 'Switch to light theme' }).click()
@@ -131,7 +131,7 @@ test('system theme, explicit preference, reload and new tabs preserve theme with
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
   await page.getByRole('button', { name: 'Switch to dark theme' }).click()
   const tab = await context.newPage()
-  await tab.goto('/en/poslugy/elainery/')
+  await tab.goto('/dentist/en/poslugy/elainery/')
   await expect(tab.locator('html')).toHaveAttribute('data-theme', 'dark')
   expect(await tab.evaluate(() => localStorage.getItem('tepla-theme'))).toBe('dark')
   expect(await tab.evaluate(() => Object.values(localStorage).join(' '))).not.toContain(
@@ -146,7 +146,7 @@ test('both languages remain readable without JavaScript and when preference stor
   const context = await browser.newContext({ javaScriptEnabled: false })
   const page = await context.newPage()
   for (const lang of ['', 'en/']) {
-    await page.goto(`http://127.0.0.1:4176/${lang}vash-shliakh-do-posmishky/`)
+    await page.goto(`http://127.0.0.1:4176/dentist/${lang}vash-shliakh-do-posmishky/`)
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('.journey-panel')).toHaveCount(6)
     await expect(page.locator('html')).toHaveAttribute('lang', lang ? 'en' : 'uk')
@@ -161,7 +161,7 @@ test('both languages remain readable without JavaScript and when preference stor
     })
   })
   const p = await isolated.newPage()
-  await p.goto('http://127.0.0.1:4176/en/')
+  await p.goto('http://127.0.0.1:4176/dentist/en/')
   await p.getByRole('button', { name: 'Switch to light theme' }).click()
   await expect(p.locator('html')).toHaveAttribute('data-theme', 'light')
   await isolated.close()
@@ -174,7 +174,7 @@ test('dark theme and English layouts meet automated WCAG AA checks at mobile and
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 1000 })
     for (const path of paths) {
-      await page.goto(`/en/${path}`)
+      await page.goto(`/dentist/en/${path}`)
       await expect(page.locator('h1')).toBeVisible()
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -191,7 +191,7 @@ test('dark theme and English layouts meet automated WCAG AA checks at mobile and
     ['en/polityka-konfidentsiinosti/', 390],
   ] as const) {
     await page.setViewportSize({ width, height: 1000 })
-    await page.goto(`/${path}`)
+    await page.goto(`/dentist/${path}`)
     const result = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
       .analyze()
@@ -208,7 +208,7 @@ test('mobile navigation is accessible in both languages and both themes', async 
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 390, height: 844 })
   for (const language of ['', 'en/']) {
-    await page.goto(`/${language}`)
+    await page.goto(`/dentist/${language}`)
     await page.locator('.menu-toggle').click()
     for (const theme of ['light', 'dark']) {
       if ((await page.locator('html').getAttribute('data-theme')) !== theme)

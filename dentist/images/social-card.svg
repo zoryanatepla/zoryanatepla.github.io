@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f8f7f4"/>
+  <circle cx="930" cy="340" r="210" fill="#e2e7da"/>
+  <circle cx="930" cy="340" r="194" stroke="#90a58a" stroke-width="1" opacity=".5" fill="none"/><path d="M805 370C860 438 1000 438 1055 370" stroke="#285e49" stroke-width="2" fill="none"/>
+  <path d="M63 72h1074M63 555h1074" stroke="#d4d8cb"/>
+  <text x="65" y="128" fill="#536458" font-family="sans-serif" font-size="15" letter-spacing="3">ЛІКАР СТОМАТОЛОГ-ОРТОДОНТ · КИЇВ</text>
+  <g fill="#242a2c" font-family="serif"><text x="61" y="265" font-size="86">Зоряна Тепла</text><text x="65" y="362" font-size="49">Ваша посмішка.</text><text x="65" y="426" font-size="49" font-style="italic" fill="#536458">Моя професійна турбота.</text></g>
+  <text x="65" y="514" fill="#536458" font-family="sans-serif" font-size="17">20+ років досвіду · Діти та дорослі</text>
+  <g fill="#285e49" font-family="serif" font-size="112"><text x="850" y="325">Z</text><text x="944" y="325">T</text></g>
+</svg>

@@ -60,4 +60,6 @@ http
       res.end('Static server error')
     }
   })
-  .listen(4176, '127.0.0.1', () => console.log('Serving the actual publishing root under /'))
+  .listen(4176, '127.0.0.1', () =>
+    console.log('Serving the actual publishing root under /dentist/'),
+  )
