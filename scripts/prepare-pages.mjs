@@ -7,8 +7,8 @@ execFileSync(process.execPath, ['scripts/verify-static.mjs'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    VITE_BASE_PATH: '/dentist/',
-    VITE_SITE_URL: 'https://formalandscape.github.io',
+    VITE_BASE_PATH: '/',
+    VITE_SITE_URL: 'https://zoryanatepla.github.io',
   },
 })
 
@@ -59,7 +59,7 @@ execFileSync(process.execPath, ['scripts/verify-static.mjs', '--published'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    VITE_BASE_PATH: '/dentist/',
-    VITE_SITE_URL: 'https://formalandscape.github.io',
+    VITE_BASE_PATH: '/',
+    VITE_SITE_URL: 'https://zoryanatepla.github.io',
   },
 })

@@ -9,13 +9,13 @@ test('three distinct original portraits load on mobile and desktop while service
     await page.setViewportSize({ width, height: 1000 })
     const sources = new Set<string>()
     for (const language of ['', 'en/']) {
-      await page.goto(`/dentist/${language}`)
+      await page.goto(`/${language}`)
       await expect(page.locator('.portrait-placeholder')).toHaveCount(0)
       for (const slot of ['hero', 'about']) {
         const image = page.locator(`.doctor-portrait--${slot}`)
         await image.scrollIntoViewIfNeeded()
         await expect(image).toBeVisible()
-        await expect(image).toHaveAttribute('src', `/dentist/images/zoryana-tepla-${slot}.webp`)
+        await expect(image).toHaveAttribute('src', `/images/zoryana-tepla-${slot}.webp`)
         await expect(image).toHaveAttribute('loading', slot === 'hero' ? 'eager' : 'lazy')
         await expect(image).toHaveAttribute(
           'alt',
@@ -27,14 +27,19 @@ test('three distinct original portraits load on mobile and desktop while service
         sources.add((await image.getAttribute('src'))!)
       }
       await expect(page.locator('.service-card .editorial-photo img')).toHaveCount(4)
-      for (const image of await page.locator('.service-card .editorial-photo img').all()) {
-        await expect(image).toHaveAttribute('src', '/dentist/images/editorial-still-life.webp')
+      for (const [index, image] of (
+        await page.locator('.service-card .editorial-photo img').all()
+      ).entries()) {
+        await expect(image).toHaveAttribute(
+          'src',
+          index === 3 ? '/images/gnathology-model.webp' : '/images/editorial-still-life.webp',
+        )
       }
-      await page.goto(`/dentist/${language}mentorstvo/`)
+      await page.goto(`/${language}mentorstvo/`)
       const image = page.locator('.mentorship-visual .doctor-portrait')
       await image.scrollIntoViewIfNeeded()
       await expect(image).toBeVisible()
-      await expect(image).toHaveAttribute('src', '/dentist/images/zoryana-tepla-mentorship.webp')
+      await expect(image).toHaveAttribute('src', '/images/zoryana-tepla-mentorship.webp')
       await expect
         .poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
         .toBe(true)
@@ -52,12 +57,12 @@ test('mentorship has complete static content, correct metadata and working reque
   request,
 }) => {
   for (const language of ['', 'en/']) {
-    const url = `/dentist/${language}mentorstvo/`
+    const url = `/${language}mentorstvo/`
     const response = await request.get(url)
     expect(response.status()).toBe(200)
     const html = await response.text()
     expect(html).not.toContain('<!--app-->')
-    expect(html).toContain(`https://formalandscape.github.io${url}`)
+    expect(html).toContain(`https://zoryanatepla.github.io${url}`)
     await page.goto(url)
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('.mentorship-card')).toHaveCount(4)
@@ -77,13 +82,13 @@ test('mentorship has complete static content, correct metadata and working reque
         'проведення програм чи навчальних курсів наразі не заявлено',
       )
   }
-  const sitemap = await (await request.get('/dentist/sitemap.xml')).text()
-  expect(sitemap).toContain('https://formalandscape.github.io/dentist/mentorstvo/')
-  expect(sitemap).toContain('https://formalandscape.github.io/dentist/en/mentorstvo/')
-  await page.goto('/dentist/vash-shliakh-do-posmishky/')
+  const sitemap = await (await request.get('/sitemap.xml')).text()
+  expect(sitemap).toContain('https://zoryanatepla.github.io/mentorstvo/')
+  expect(sitemap).toContain('https://zoryanatepla.github.io/en/mentorstvo/')
+  await page.goto('/vash-shliakh-do-posmishky/')
   await expect(page.locator('.journey-hero .encouragement')).toHaveCount(0)
   await expect(page.locator('.journey-art .doctor-portrait')).toBeVisible()
-  await page.goto('/dentist/#faq')
+  await page.goto('/#faq')
   await page
     .getByRole('button', { name: 'Коли потрібна консультація з питань роботи щелепного суглоба?' })
     .click()
@@ -98,7 +103,7 @@ test('palette blends through intermediate colours and rapid changes settle witho
   context,
 }) => {
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'no-preference' })
-  await page.goto('/dentist/#appointment')
+  await page.goto('/#appointment')
   await page.locator('#name').fill('Перевірка теми')
   const samples = await page.evaluate(async () => {
     const selectors = ['body', '.site-header', '.form-card', '.invitation-section']
@@ -134,7 +139,7 @@ test('palette blends through intermediate colours and rapid changes settle witho
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await expect.poll(() => page.evaluate(() => localStorage.getItem('tepla-theme'))).toBe('dark')
   const tab = await context.newPage()
-  await tab.goto('/dentist/mentorstvo/')
+  await tab.goto('/mentorstvo/')
   await expect(tab.locator('html')).toHaveAttribute('data-theme', 'dark')
   await tab.locator('.theme-toggle').click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
@@ -149,7 +154,7 @@ test('mentorship fits small screens, has accessible themes and keyboard mobile n
   await page.emulateMedia({ reducedMotion: 'reduce' })
   for (const width of [320, 390, 768, 1100, 1440]) {
     await page.setViewportSize({ width, height: 900 })
-    await page.goto('/dentist/mentorstvo/')
+    await page.goto('/mentorstvo/')
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
       `width ${width}`,
@@ -171,9 +176,9 @@ test('mentorship fits small screens, has accessible themes and keyboard mobile n
     }
   }
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/dentist/')
+  await page.goto('/')
   await page.locator('.menu-toggle').click()
-  const link = page.locator('#mobile-menu a[href="/dentist/mentorstvo/"]')
+  const link = page.locator('#mobile-menu a[href="/mentorstvo/"]')
   await link.focus()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/mentorstvo\/$/)
@@ -187,7 +192,7 @@ test('new content remains available without JavaScript and system theme applies 
 }) => {
   const staticContext = await browser.newContext({ javaScriptEnabled: false })
   const page = await staticContext.newPage()
-  await page.goto('http://127.0.0.1:4176/dentist/mentorstvo/')
+  await page.goto('http://127.0.0.1:4176/mentorstvo/')
   await expect(page.locator('h1')).toBeVisible()
   await expect(page.locator('.mentorship-stage')).toHaveCount(4)
   await expect(page.locator('.mentorship-request .button')).toHaveAttribute(
@@ -206,7 +211,7 @@ test('new content remains available without JavaScript and system theme applies 
   const p = await blocked.newPage()
   // Runs before React: a blocked storage API must not skip the system palette.
   await p.route('**/assets/*.js', (route) => route.abort())
-  await p.goto('http://127.0.0.1:4176/dentist/mentorstvo/')
+  await p.goto('http://127.0.0.1:4176/mentorstvo/')
   await expect(p.locator('html')).toHaveAttribute('data-theme', 'dark')
   await blocked.close()
 })
@@ -214,7 +219,7 @@ test('new content remains available without JavaScript and system theme applies 
 test('scroll reveals use distinct motions and reduced motion cancels theme and scroll animation', async ({
   page,
 }) => {
-  await page.goto('/dentist/mentorstvo/')
+  await page.goto('/mentorstvo/')
   await page.locator('.mentorship-card').first().scrollIntoViewIfNeeded()
   await expect(page.locator('.mentorship-card').first()).toHaveAttribute(
     'data-reveal-kind',

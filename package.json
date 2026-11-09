@@ -11,7 +11,7 @@
     "check": "tsc -b",
     "format": "prettier --write src scripts tests *.ts *.json README.md",
     "verify:static": "node scripts/verify-static.mjs",
-    "build:pages": "VITE_BASE_PATH=/dentist/ VITE_SITE_URL=https://formalandscape.github.io npm run build && VITE_BASE_PATH=/dentist/ VITE_SITE_URL=https://formalandscape.github.io npm run verify:static",
+    "build:pages": "VITE_BASE_PATH=/ VITE_SITE_URL=https://zoryanatepla.github.io npm run build && VITE_BASE_PATH=/ VITE_SITE_URL=https://zoryanatepla.github.io npm run verify:static",
     "prepare:pages": "npm run build:pages && node scripts/prepare-pages.mjs",
     "test:pages": "playwright test --config playwright.pages.config.ts"
   },

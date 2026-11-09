@@ -20,12 +20,7 @@ http
   .createServer(async (req, res) => {
     try {
       const url = new URL(req.url, 'http://localhost')
-      if (!url.pathname.startsWith('/dentist/')) {
-        res.writeHead(404)
-        res.end()
-        return
-      }
-      const name = decodeURIComponent(url.pathname.slice('/dentist/'.length))
+      const name = decodeURIComponent(url.pathname.slice(1))
       let file = path.resolve(root, name || 'index.html')
       if (!file.startsWith(`${root}/`)) {
         res.writeHead(403)
@@ -65,6 +60,4 @@ http
       res.end('Static server error')
     }
   })
-  .listen(4176, '127.0.0.1', () =>
-    console.log('Serving the actual publishing root under /dentist/'),
-  )
+  .listen(4176, '127.0.0.1', () => console.log('Serving the actual publishing root under /'))
