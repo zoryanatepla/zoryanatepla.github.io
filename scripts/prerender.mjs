@@ -34,7 +34,6 @@ try {
     journeyPath,
     localizedPath,
     languageForPath,
-    withoutLanguage,
   } = await vite.ssrLoadModule('/entry-server.tsx')
   const template = await fs.readFile('dist/index.html', 'utf8')
   const assetNames = await fs.readdir('dist/assets')
@@ -93,7 +92,7 @@ try {
             `<meta name="google-site-verification" content="${escape(env.VITE_GOOGLE_SITE_VERIFICATION)}" />`,
           ]
         : []),
-      ...(withoutLanguage(path) === '/'
+      ...(!seo.noindex
         ? [
             `<script type="application/ld+json">${JSON.stringify({ ...schemaForPath(path), ...(url ? { url } : {}) }).replaceAll('<', '\\u003c')}</script>`,
           ]
@@ -120,7 +119,7 @@ try {
   if (origin)
     await fs.writeFile(
       'dist/sitemap.xml',
-      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map((path) => `<url><loc>${escape(canonical(path))}</loc></url>`).join('')}</urlset>`,
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${paths.map((path) => `<url><loc>${escape(canonical(path))}</loc>${['uk', 'en', 'x-default'].map((locale) => `<xhtml:link rel="alternate" hreflang="${locale}" href="${escape(canonical(localizedPath(path, locale === 'en' ? 'en' : 'uk')))}" />`).join('')}</url>`).join('')}</urlset>`,
     )
   else
     console.warn(

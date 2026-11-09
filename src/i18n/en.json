@@ -493,5 +493,11 @@
   "Текст виділено. Скопіюйте його вручну й вставте в чат Telegram.": "The text is selected. Copy it manually and paste it into the Telegram chat.",
   "Після заповнення форми сайт готує текст заявки у вікні попереднього перегляду. Ви можете скопіювати його або відкрити чат лікаря в Telegram із підготовленим повідомленням. Сайт не надсилає заявку автоматично: остаточне надсилання ви підтверджуєте в Telegram.": "After you fill in the form, the website prepares a request preview. You can copy it or open the doctor’s Telegram chat with a prepared message. The website does not send the request automatically: you confirm sending in Telegram.",
   "Після відкриття Telegram обробка даних відбувається за правилами цього сервісу. Якщо застосунок не підставив текст, скопіюйте заявку й вставте її в чат.": "Once Telegram opens, its privacy policy applies. If the app does not insert the text, copy the request and paste it into the chat.",
-  "Політика конфіденційності Telegram": "Telegram privacy policy"
+  "Політика конфіденційності Telegram": "Telegram privacy policy",
+  "Брекети в Києві: консультація ортодонта Зоряни Теплої, діагностика та індивідуальний план лікування. Прийом у клініці Лукашука на вул. Юлії Здановської, 58А.": "Braces in Kyiv with orthodontist Zoryana Tepla: assessment and individual treatment planning. Consultations at Lukashuk Clinic, 58A Yulii Zdanovskoi Street.",
+  "Елайнери в Києві: консультація Зоряни Теплої щодо прозорих кап, діагностика й планування лікування за показаннями. Прийом у клініці Лукашука, запис онлайн.": "Clear aligners in Kyiv: consultation with Zoryana Tepla, assessment and treatment planning based on clinical indications. Book a visit at Lukashuk Clinic.",
+  "Дитячий ортодонт у Києві — Зоряна Тепла. Огляд розвитку прикусу, рекомендації батькам та індивідуальний план спостереження чи лікування. Клініка Лукашука.": "Children’s orthodontics in Kyiv with Zoryana Tepla: bite development assessment, guidance for parents and individual care planning at Lukashuk Clinic.",
+  "Гнатологія в Києві: консультація Зоряни Теплої, оцінка роботи щелепного суглоба, жувальних м’язів і прикусу. Індивідуальна діагностика у клініці Лукашука.": "Gnathology in Kyiv: consultation with Zoryana Tepla to assess jaw joint function, chewing muscles and bite. Individual assessment at Lukashuk Clinic.",
+  "Ортодонт у Києві — Зоряна Тепла | Брекети та елайнери": "Orthodontist in Kyiv — Zoryana Tepla | Braces and Aligners",
+  "Головна": "Home"
 }

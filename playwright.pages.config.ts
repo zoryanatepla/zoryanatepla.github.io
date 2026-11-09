@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './tests',
   testMatch: [
     'pages.spec.ts',
+    'seo.spec.ts',
     'motion.spec.ts',
     'preferences.spec.ts',
     'premium.spec.ts',

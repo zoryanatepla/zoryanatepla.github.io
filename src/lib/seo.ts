@@ -31,7 +31,7 @@ function ukrainianSeo(path: string) {
   if (service)
     return {
       title: service.seoTitle,
-      description: `${service.description} Індивідуальна діагностика та планування лікування дітей і дорослих. Лікар ортодонт Зоряна Тепла, Київ.`,
+      description: service.seoDescription,
       path: servicePath(service.id),
     }
   if (path.startsWith('/polityka-konfidentsiinosti'))
@@ -49,7 +49,7 @@ function ukrainianSeo(path: string) {
       noindex: true,
     }
   return {
-    title: 'Зоряна Тепла — лікар ортодонт у Києві',
+    title: 'Ортодонт у Києві — Зоряна Тепла | Брекети та елайнери',
     description:
       'Зоряна Тепла — стоматолог-ортодонт у Києві. 20+ років досвіду. Ортодонтичне лікування дітей і дорослих, брекети, елайнери та діагностика прикусу.',
     path: '/',
@@ -60,15 +60,10 @@ export function seoForPath(path: string) {
   const language = languageForPath(path)
   const clean = withoutLanguage(path)
   const seo = ukrainianSeo(clean)
-  const service = services.find(
-    (s) => clean.replace(/\/$/, '') === servicePath(s.id).replace(/\/$/, ''),
-  )
   return {
     ...seo,
     title: translate(seo.title, language),
-    description: service
-      ? `${translate(service.description, language)} ${translate('Індивідуальна діагностика та планування лікування дітей і дорослих. Лікар ортодонт Зоряна Тепла, Київ.', language)}`
-      : translate(seo.description, language),
+    description: translate(seo.description, language),
     path: localizedPath(seo.path, language),
   }
 }
@@ -76,13 +71,22 @@ export function seoForPath(path: string) {
 export function schemaForPath(path: string) {
   const language = languageForPath(path)
   const t = (text: string) => translate(text, language)
-  return {
-    '@context': 'https://schema.org',
+  const seo = seoForPath(path)
+  const homeUrl = publicUrl('/')
+  const url = publicUrl(seo.path)
+  const doctorId = homeUrl ? `${homeUrl}#doctor` : undefined
+  const doctor = {
     '@type': 'Physician',
+    '@id': doctorId,
     name: t(site.doctor.fullName),
+    alternateName: t(site.doctor.name),
+    url: publicUrl(localizedPath('/', language)),
     description: t(site.doctor.role),
     medicalSpecialty: 'Dentistry',
     telephone: site.contacts.phone,
+    email: site.contacts.email,
+    image: publicUrl('/images/zoryana-tepla-hero.webp'),
+    logo: publicUrl('/favicon-zt-512.png'),
     sameAs: [site.contacts.instagram],
     areaServed: { '@type': 'City', name: t(site.doctor.city) },
     address: {
@@ -96,6 +100,55 @@ export function schemaForPath(path: string) {
     hasMap: site.contacts.mapsUrl,
     memberOf: site.associations.map((a) => ({ '@type': 'Organization', name: t(a.description) })),
   }
+  const page = {
+    '@type': 'WebPage',
+    '@id': url ? `${url}#webpage` : undefined,
+    url,
+    name: seo.title,
+    description: seo.description,
+    inLanguage: language,
+    isPartOf: {
+      '@type': 'WebSite',
+      '@id': homeUrl ? `${homeUrl}#website` : undefined,
+      url: homeUrl,
+      name: t(site.doctor.name),
+      inLanguage: ['uk', 'en'],
+      publisher: doctorId ? { '@id': doctorId } : doctor,
+    },
+    ...(withoutLanguage(path) !== '/'
+      ? {
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: t('Головна'),
+                item: publicUrl(localizedPath('/', language)),
+              },
+              { '@type': 'ListItem', position: 2, name: seo.title, item: url },
+            ],
+          },
+        }
+      : {}),
+  }
+  if (withoutLanguage(path) === '/')
+    return { '@context': 'https://schema.org', ...doctor, mainEntityOfPage: page }
+  const service = services.find((entry) => servicePath(entry.id) === withoutLanguage(seo.path))
+  if (service)
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      '@id': url ? `${url}#service` : undefined,
+      url,
+      name: t(service.title),
+      serviceType: t(service.title),
+      description: t(service.description),
+      areaServed: doctor.areaServed,
+      provider: doctor,
+      mainEntityOfPage: page,
+    }
+  return { '@context': 'https://schema.org', ...page, about: doctor }
 }
 export const schema = schemaForPath('/')
 

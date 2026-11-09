@@ -94,7 +94,7 @@ export function RouteEffects() {
           }
         const structured = document.querySelector('script[type="application/ld+json"]')
         if (structured) structured.remove()
-        if (withoutLanguage(pathname) === '/') {
+        if (!seo.noindex) {
           const script = document.createElement('script')
           script.type = 'application/ld+json'
           script.textContent = JSON.stringify({ ...schemaForPath(pathname), url: canonical })
