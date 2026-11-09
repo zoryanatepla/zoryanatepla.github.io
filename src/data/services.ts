@@ -57,7 +57,7 @@ export const services = [
     number: '04',
     title: 'Гнатологія',
     subtitle: 'Гармонія починається з балансу',
-    image: 'balance',
+    image: 'gnathology',
     description:
       'Діагностика функціональних особливостей зубощелепної системи, прикусу та скронево-нижньощелепних суглобів.',
     intro:

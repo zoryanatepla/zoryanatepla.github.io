@@ -105,16 +105,17 @@ export function Photo({
             aligners: t('Ілюстративне зображення прозорих елайнерів'),
             children: t('Ілюстративний натюрморт: дерев’яна іграшка та шавлієва ваза'),
             balance: t('Ілюстративна скульптура як символ гармонії та балансу'),
+            gnathology: t('Ілюстративна модель щелеп і щелепного суглоба'),
           }[kind] ||
           t('Декоративне зображення')
         }
       >
         <img
-          src={`${import.meta.env.BASE_URL}images/editorial-still-life.webp`}
+          src={`${import.meta.env.BASE_URL}images/${kind === 'gnathology' ? 'gnathology-model.webp' : 'editorial-still-life.webp'}`}
           alt=""
           aria-hidden="true"
-          width="1774"
-          height="887"
+          width={kind === 'gnathology' ? 1200 : 1774}
+          height={kind === 'gnathology' ? 800 : 887}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
         />

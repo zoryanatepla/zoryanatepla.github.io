@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import type { PointerEvent } from 'react'
+import type { CSSProperties, PointerEvent } from 'react'
 import { ChevronsLeftRight } from 'lucide-react'
 import { useI18n } from '../i18n/I18n'
-import type { TreatmentResult } from '../data/site'
+import type { ResultFraming, TreatmentResult } from '../data/site'
+
+function imageFraming(frame: ResultFraming): CSSProperties {
+  return {
+    width: `${frame.scale * 100}%`,
+    transform: `translate(-${frame.x}%, -${frame.y}%)`,
+  }
+}
 
 export function BeforeAfterPair({
   result,
@@ -25,6 +32,7 @@ export function BeforeAfterPair({
         <div className="comparison-before" style={{ clipPath: `inset(0 ${100 - amount}% 0 0)` }}>
           <img
             src={result.before}
+            style={imageFraming(result.framing.before)}
             alt={t(result.beforeAlt)}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
@@ -34,6 +42,7 @@ export function BeforeAfterPair({
         <div className="comparison-after">
           <img
             src={result.after}
+            style={imageFraming(result.framing.after)}
             alt={t(result.afterAlt)}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"

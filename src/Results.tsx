@@ -1,4 +1,4 @@
-import { treatmentResults } from './data/site'
+import { galleryResults } from './data/site'
 import { BeforeAfterPair } from './components/BeforeAfterPair'
 import { Action, Eyebrow, Reveal } from './components/ui'
 import { AnimatedHeading } from './motion/AnimatedHeading'
@@ -22,7 +22,7 @@ export function ResultsPage() {
       </section>
       <section className="section cases-gallery" aria-label={t('Фотографії до та після лікування')}>
         <div className="container">
-          {treatmentResults.map((result, index) => (
+          {galleryResults.map((result, index) => (
             <Reveal className="case-card" key={result.id}>
               <BeforeAfterPair result={result} priority={index === 0} />
             </Reveal>

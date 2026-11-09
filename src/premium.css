@@ -767,7 +767,7 @@ body:has(.mentorship-hero) .mobile-booking {
   overflow: hidden;
 }
 .comparison.before-after-pair {
-  aspect-ratio: 1.7;
+  aspect-ratio: 2.2;
   background: var(--surface-soft);
 }
 .before-after-pair .comparison-before,
@@ -782,10 +782,13 @@ body:has(.mentorship-hero) .mobile-booking {
   z-index: 0;
 }
 .before-after-pair img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  max-width: none;
+  height: auto;
+  object-fit: initial;
   background: var(--surface-soft);
   pointer-events: none;
   user-select: none;
@@ -839,4 +842,28 @@ body:has(.mentorship-hero) .mobile-booking {
   .cases-gallery > .container {
     gap: 28px;
   }
+}
+
+.approach-visual {
+  overflow: hidden;
+}
+.approach-visual > .doctor-portrait {
+  position: absolute;
+  bottom: 0;
+  display: block;
+  width: 100%;
+  height: 134%;
+  object-fit: cover;
+  object-position: center bottom;
+  border-radius: inherit;
+}
+
+.editorial-photo.photo-gnathology > img {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  object-fit: cover;
+  object-position: 58% center;
+  transform: none;
 }

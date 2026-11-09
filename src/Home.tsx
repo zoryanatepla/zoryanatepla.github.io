@@ -309,7 +309,7 @@ function Approach() {
           </Action>
         </Reveal>
         <Reveal className="approach-visual">
-          <Photo kind="balance" />
+          <DoctorPortrait slot="mentorship" />
         </Reveal>
       </div>
     </section>

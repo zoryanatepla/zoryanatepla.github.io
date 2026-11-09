@@ -96,10 +96,20 @@ export type TreatmentResult = {
   after: string
   beforeAlt: string
   afterAlt: string
+  framing: { before: ResultFraming; after: ResultFraming }
 }
+// Fixed framing uses the upper central incisors as the reference, without changing pixels.
+export type ResultFraming = { scale: number; x: number; y: number }
+const resultFraming: TreatmentResult['framing'][] = [
+  { before: { scale: 1.16, x: 50.3, y: 42.8 }, after: { scale: 1.257, x: 49.2, y: 49 } },
+  { before: { scale: 1.222, x: 50.6, y: 64.5 }, after: { scale: 1.335, x: 48.2, y: 56 } },
+  { before: { scale: 1.133, x: 49, y: 40.8 }, after: { scale: 1.17, x: 48.6, y: 51.3 } },
+  { before: { scale: 1.129, x: 48.8, y: 61 }, after: { scale: 1.179, x: 48, y: 52 } },
+]
 // User-supplied originals in order: 01–02, 03–04, 05–06, 07–08.
 export const treatmentResults: TreatmentResult[] = Array.from({ length: 4 }, (_, index) => ({
   id: `case-${index + 1}`,
+  framing: resultFraming[index],
   title: 'Ортодонтичне лікування',
   description: '',
   before: `${import.meta.env.BASE_URL}images/results/${String(index * 2 + 1).padStart(2, '0')}.webp`,
@@ -107,4 +117,6 @@ export const treatmentResults: TreatmentResult[] = Array.from({ length: 4 }, (_,
   beforeAlt: 'Фото зубів до ортодонтичного лікування',
   afterAlt: 'Фото зубів після ортодонтичного лікування',
 }))
-export const featuredResult = treatmentResults[2]
+export const featuredResult = treatmentResults[1]
+// The former featured case occupies the second gallery slot; the new one stays on home.
+export const galleryResults = [treatmentResults[0], treatmentResults[2], treatmentResults[3]]
