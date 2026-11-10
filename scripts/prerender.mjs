@@ -1,3 +1,4 @@
+import brand from '../src/data/brand.json' with { type: 'json' }
 import fs from 'node:fs/promises'
 import { createServer, loadEnv } from 'vite'
 
@@ -67,7 +68,7 @@ try {
       ),
       '<meta property="og:type" content="website" />',
       `<meta property="og:locale" content="${language === 'en' ? 'en_GB' : 'uk_UA'}" />`,
-      `<meta property="og:site_name" content="${language === 'en' ? 'Zoryana Tepla · Orthodontist' : 'Зоряна Тепла · Ортодонт'}" />`,
+      `<meta property="og:site_name" content="${escape(language === 'en' ? brand.nameEn : brand.name)}" />`,
       `<meta property="og:title" content="${escape(seo.title)}" />`,
       `<meta property="og:description" content="${escape(seo.description)}" />`,
       `<meta name="robots" content="${seo.noindex ? 'noindex, follow' : 'index, follow'}" />`,

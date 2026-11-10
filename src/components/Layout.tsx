@@ -1,3 +1,4 @@
+import brand from '../data/brand.json'
 import { useI18n } from '../i18n/I18n'
 import { Preferences } from './Preferences'
 import { withoutLanguage, languageForPath, localizedPath } from '../lib/locale'
@@ -64,11 +65,7 @@ export function RouteEffects() {
       const language = languageForPath(pathname)
       document.documentElement.lang = language
       meta('og:locale', language === 'en' ? 'en_GB' : 'uk_UA', true)
-      meta(
-        'og:site_name',
-        language === 'en' ? 'Zoryana Tepla · Orthodontist' : 'Зоряна Тепла · Ортодонт',
-        true,
-      )
+      meta('og:site_name', language === 'en' ? brand.nameEn : brand.name, true)
       meta('description', seo.description)
       meta('og:title', seo.title, true)
       meta('og:description', seo.description, true)

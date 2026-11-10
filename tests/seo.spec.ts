@@ -130,3 +130,29 @@ test('missing published URLs return a non-indexable 404 without redirecting to h
   await expect(page.locator('h1')).toHaveText('Сторінку не знайдено')
   await expect(page.getByRole('link', { name: 'Перейти на головну' })).toHaveAttribute('href', base)
 })
+
+test('domain homepage declares the doctor brand and the site uses the same domain identity', async ({
+  request,
+}) => {
+  const root = await request.get('/')
+  expect(root.status()).toBe(200)
+  const rootHtml = await root.text()
+  const website = readSchema(rootHtml)
+  expect(website['@type']).toBe('WebSite')
+  expect(website.name).toBe('Зоряна Тепла — ортодонт')
+  expect(website.alternateName).toContain('Zoryana Tepla')
+  expect(website.url).toBe(origin + '/')
+  expect(rootHtml).toContain('<h1>Зоряна Тепла — ортодонт</h1>')
+  expect(rootHtml).toContain('url=/dentist/')
+  expect(rootHtml).not.toContain('GitHub Pages documentation')
+  for (const language of ['', 'en/']) {
+    const html = await (await request.get(base + language)).text()
+    const physician = readSchema(html)
+    const identity = physician.mainEntityOfPage.isPartOf
+    expect(identity['@id']).toBe(website['@id'])
+    expect(identity.url).toBe(website.url)
+    expect(identity.name).toBe(language ? 'Zoryana Tepla — Orthodontist' : website.name)
+    expect(html).toContain(`property="og:site_name" content="${identity.name}"`)
+    expect(physician.url).toBe(origin + base + language)
+  }
+})

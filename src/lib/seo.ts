@@ -1,3 +1,4 @@
+import brand from '../data/brand.json'
 import { languageForPath, withoutLanguage, localizedPath, translate } from './locale'
 import { site } from '../data/site'
 import { services, servicePath } from '../data/services'
@@ -73,6 +74,7 @@ export function schemaForPath(path: string) {
   const t = (text: string) => translate(text, language)
   const seo = seoForPath(path)
   const homeUrl = publicUrl('/')
+  const siteRoot = homeUrl ? new URL(homeUrl).origin + '/' : undefined
   const url = publicUrl(seo.path)
   const doctorId = homeUrl ? `${homeUrl}#doctor` : undefined
   const doctor = {
@@ -109,9 +111,10 @@ export function schemaForPath(path: string) {
     inLanguage: language,
     isPartOf: {
       '@type': 'WebSite',
-      '@id': homeUrl ? `${homeUrl}#website` : undefined,
-      url: homeUrl,
-      name: t(site.doctor.name),
+      '@id': siteRoot ? `${siteRoot}#website` : undefined,
+      url: siteRoot,
+      name: language === 'en' ? brand.nameEn : brand.name,
+      alternateName: brand.alternateName,
       inLanguage: ['uk', 'en'],
       publisher: doctorId ? { '@id': doctorId } : doctor,
     },

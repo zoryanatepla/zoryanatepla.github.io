@@ -1,3 +1,4 @@
+import brand from '../src/data/brand.json' with { type: 'json' }
 import fs from 'node:fs/promises'
 import { execFileSync } from 'node:child_process'
 
@@ -60,8 +61,23 @@ for (const icon of [
 ]) {
   await fs.copyFile(`dist/${icon}`, icon)
 }
+// Google site names apply to the domain, so expose WebSite data on its root homepage.
+const rootWebsite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': 'https://zoryanatepla.github.io/#website',
+  url: 'https://zoryanatepla.github.io/',
+  name: brand.name,
+  alternateName: brand.alternateName,
+  inLanguage: ['uk', 'en'],
+  publisher: { '@id': 'https://zoryanatepla.github.io/dentist/#doctor' },
+}
 function redirectHtml(destination) {
-  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Зоряна Тепла — сайт</title><link rel="icon" type="image/png" sizes="96x96" href="/favicon-zt.png?v=zt1"><link rel="shortcut icon" href="/favicon.ico?v=zt1"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=zt1"><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
+  const identity =
+    destination === '/dentist/'
+      ? `<script type="application/ld+json">${JSON.stringify(rootWebsite).replaceAll('<', '\\u003c')}</script>`
+      : ''
+  return `<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${brand.name}</title><meta property="og:site_name" content="${brand.name}"><meta property="og:title" content="${brand.name}"><meta name="application-name" content="${brand.name}">${identity}<link rel="icon" type="image/png" sizes="96x96" href="/favicon-zt.png?v=zt1"><link rel="shortcut icon" href="/favicon.ico?v=zt1"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=zt1"><meta http-equiv="refresh" content="0;url=${destination}"><link rel="canonical" href="https://zoryanatepla.github.io${destination}"></head><body><h1>${brand.name}</h1><a href="${destination}">Відкрити сайт Зоряни Теплої</a><script>location.replace(${JSON.stringify(destination)} + location.search + location.hash)</script></body></html>`
 }
 await fs.writeFile('index.html', redirectHtml('/dentist/'))
 // Return an actual non-indexable error page instead of redirecting missing URLs to home.
